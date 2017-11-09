@@ -142,7 +142,6 @@ void update()
 		allPrimitives[index]();
 	}
 
-
 	glFlush();
 	glutSwapBuffers();
 }
