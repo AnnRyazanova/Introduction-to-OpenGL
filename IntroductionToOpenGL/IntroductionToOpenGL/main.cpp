@@ -13,10 +13,19 @@ struct Color
 	float B;
 };
 
-int index = 0;
+double rotateX = 0;
+double rotateY = 0;
+double rotateZ = 0;
+
 static Color color;
+
 static int w = 0, h = 0;
+
+// Первая показанная картинка (стандартный примитив : куб + 2 треугольника + четырехугольник)
 bool firstShow = true;
+
+// Индекс примитива в векторе, который нужно выводить 
+int index = 0;
 
 // Ф-ия вызываемая перед вхождением в главный цикл
 void init(void)
@@ -48,6 +57,7 @@ void rectangle()
 
 // Ф-ии построения стандартных примитивов:
 
+// Ф-ия построения куба
 void solidCube()
 { 
 	glutSolidCube(0.5); 
@@ -104,7 +114,6 @@ void triangleWithDifferentVertex()
 	glEnd();
 }
 
-
 typedef void(*callback_t)(void);
 vector<callback_t> allPrimitives = { solidCube, wireCube, wireTeapot, wireTorus,
 									 wireTetrahedron, wireIcosahedron };
@@ -120,12 +129,31 @@ void mouseChangePrimitive(int button, int state, int x, int y)
 	}
 }
 
+// Управление клавиатурой
+void specialKeys(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_UP: rotateX += 5; break;
+	case GLUT_KEY_DOWN: rotateX -= 5; break;
+	case GLUT_KEY_RIGHT: rotateY += 5; break;
+	case GLUT_KEY_LEFT: rotateY -= 5; break;
+	case GLUT_KEY_PAGE_UP: rotateZ += 5; break;
+	case GLUT_KEY_PAGE_DOWN: rotateZ -= 5; break;
+	}
+	glutPostRedisplay();
+}
 
 // Ф-ия, вызываемая каждый кадр
 void update()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	glLoadIdentity();
+	glRotatef(rotateX, 1.0, 0.0, 0.0);
+	glRotatef(rotateY, 0.0, 1.0, 0.0);
+	glRotatef(rotateZ, 0.0, 0.0, 1.0);
 
 	if (firstShow)
 	{
@@ -153,8 +181,6 @@ void reshape(int width, int height)
 	h = height;
 }
 
-
-
 int main(int argc, char * argv[])
 {
 	srand(time(0));
@@ -166,6 +192,7 @@ int main(int argc, char * argv[])
 	glutDisplayFunc(update);					
 	glutReshapeFunc(reshape);
 	glutMouseFunc(mouseChangePrimitive);
+	glutSpecialFunc(specialKeys);
 	init();
 	glutMainLoop();
 	return 0;
